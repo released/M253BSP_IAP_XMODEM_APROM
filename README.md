@@ -125,4 +125,11 @@ in Application project , press '1' will reset to Boot loader
 
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/APROM_press_Z.jpg)
 
+9. under GCC project , replace different loader file as below (ISP code , app code)
+
+ISP code
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/GCC_ld_isp.jpg)
+
+APP code
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/GCC_ld_application.jpg)
 
