@@ -144,11 +144,14 @@ APP code
 10. use SRAM with no init section , to store flag 
 
 the flag in ISP code and AP code ( separate with GCC and KEIL compiler ) 
-![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag)
+
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag.jpg)
 
 set SRAM with no init : KEIL option IRM1/IRAM2
+
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag_KEIL.jpg)
 
 set SRAM with no init : GCC loader
+
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag_GCC_loader_file.jpg)
 
