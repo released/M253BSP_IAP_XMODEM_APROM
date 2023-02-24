@@ -36,7 +36,11 @@ uint32_t g_apromSize, g_dataFlashAddr, g_dataFlashSize;
 // __noinit__ int flag_check_ISP_process __attribute__((at( 0x20003FF4)));
 
 // for MDK AC6
+#if defined ( __GNUC__ ) && !defined(__ARMCC_VERSION)
+int flag_check_ISP_process __attribute__((section(".ram_no_init_bss.ARM.__at_0x20003FF4")));
+#else
 int flag_check_ISP_process __attribute__((section(".bss.ARM.__at_0x20003FF4")));
+#endif
 
 void FMC_ISP(uint32_t u32Cmd, uint32_t u32Addr, uint32_t u32Data)
 {

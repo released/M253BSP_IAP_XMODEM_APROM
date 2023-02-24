@@ -42,7 +42,11 @@ volatile uint32_t counter_tick = 0;
 // __noinit__ int flag_simple_test __attribute__((at( 0x20003FF8)));
 
 // for MDK AC6
+#if defined ( __GNUC__ ) && !defined(__ARMCC_VERSION)
+int flag_check_ISP_process __attribute__((section(".ram_no_init_bss.ARM.__at_0x20003FF4")));
+#else
 int flag_check_ISP_process __attribute__((section(".bss.ARM.__at_0x20003FF4")));
+#endif
 // int flag_simple_test __attribute__((section(".bss.ARM.__at_0x20003FF8")));
 
 #define RST_ADDR_LDROM                                  (0)
@@ -142,7 +146,6 @@ void tick_counter(void)
 // 	TIMER_Delay(TIMER0, 1000*ms);
 // }
 
-
 void SystemReboot_RST(unsigned char addr , unsigned char sel)
 {
     while(!UART_IS_TX_EMPTY(DEBUG_UART_PORT));
@@ -180,6 +183,44 @@ void SystemReboot_RST(unsigned char addr , unsigned char sel)
             SYS_ResetChip();// Reset I/O and peripherals ,  BS(FMC_ISPCTL[1]) reload from CONFIG setting (CBS)
             break;                       
     } 
+}
+
+void FMC_ISP(uint32_t u32Cmd, uint32_t u32Addr, uint32_t u32Data)
+{
+    FMC_ENABLE_AP_UPDATE();    
+    
+    FMC->ISPCMD = u32Cmd;
+    FMC->ISPADDR = u32Addr;
+    FMC->ISPDAT = u32Data;
+    FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
+    __ISB();
+    //while(FMC->ISPTRG);
+    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk) { }
+    
+    if (FMC->ISPCTL & FMC_ISPCTL_ISPFF_Msk)
+    {    
+        
+        printf("ISPCTL : ISPFF(0x%2X)\r\n" , FMC->ISPCTL);
+        FMC->ISPCTL |= FMC_ISPCTL_ISPFF_Msk;
+        while(1);
+    }
+}
+
+void erase_checksum(uint32_t u32Addr, uint32_t u32Data)
+{
+    printf("%s:0x%8X,0x%8X\r\n",__FUNCTION__,u32Addr,u32Data);
+    while(!UART_IS_TX_EMPTY(DEBUG_UART_PORT));
+
+    SYS_UnlockReg();
+    CLK->AHBCLK |= CLK_AHBCLK_ISPCKEN_Msk | CLK_AHBCLK_EXSTCKEN_Msk;
+    FMC->ISPCTL |= FMC_ISPCTL_ISPEN_Msk | FMC_ISPCTL_APUEN_Msk;
+
+    if ((u32Addr & (FMC_FLASH_PAGE_SIZE - 1)) == 0)
+        FMC_ISP(FMC_ISPCMD_PAGE_ERASE, u32Addr, 0);
+
+
+    FMC_ISP(FMC_ISPCMD_PROGRAM, u32Addr, u32Data);
+
 }
 
 uint8_t read_magic_tag(void)
@@ -284,6 +325,13 @@ void UARTx_Process(void)
 	            printf("Perform RST to enter BOOTLOADER\r\n");
 	            SystemReboot_RST(RST_ADDR_APROM,RST_SEL_CPU);
 				break;
+
+			case '2':
+    			erase_checksum(0x1FFFC , 0x0000);   // 0x20000 - 4
+
+	            printf("Perform RST to enter BOOTLOADER\r\n");
+	            SystemReboot_RST(RST_ADDR_APROM,RST_SEL_CPU);
+				break;                
 
 			case 'X':
 			case 'x':

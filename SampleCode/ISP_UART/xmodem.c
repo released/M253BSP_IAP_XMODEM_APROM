@@ -173,11 +173,17 @@ int32_t Xmodem(uint32_t u32DestAddr)
     int32_t i32TransBytes = 0;
     int32_t ch;
     uint32_t u32StarAddr, u32Data;
+    static uint8_t timeout_flag = 1;
 
     for(;;)
     {
         for(i = 0; i < XMD_MAX_TIMEOUT; ++i) /* set timeout period */
         {
+            if (get_TimeoutFlag())
+            {
+                check_Timeout();
+            }
+
             if(trychar)
                 XMD_putc(trychar);
 
@@ -264,6 +270,8 @@ START_RECEIVE:
                                 continue;
                         }
                         i32TransBytes += count;
+                        
+                        set_TimeoutFlag(0);   // start to receive , no more counting 
                         #if 1       // debug
                         LDROM_DEBUG("Xmodem : 0x%8X , 0x%8X \r\n" , u32StarAddr , i32TransBytes);
                         #endif

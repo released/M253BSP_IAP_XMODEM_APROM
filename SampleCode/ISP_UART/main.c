@@ -14,7 +14,7 @@
 
 struct flag_32bit flag_PROJ_CTL;
 #define FLAG_PROJ_TIMER_PERIOD_1000MS                 	(flag_PROJ_CTL.bit0)
-#define FLAG_PROJ_REVERSE1                   			(flag_PROJ_CTL.bit1)
+#define FLAG_PROJ_REVERSE1                			    (flag_PROJ_CTL.bit1)
 #define FLAG_PROJ_REVERSE2                 				(flag_PROJ_CTL.bit2)
 #define FLAG_PROJ_REVERSE3                              (flag_PROJ_CTL.bit3)
 #define FLAG_PROJ_REVERSE4                              (flag_PROJ_CTL.bit4)
@@ -28,12 +28,13 @@ struct flag_32bit flag_PROJ_CTL;
 volatile unsigned int counter_systick = 0;
 volatile uint32_t counter_tick = 0;
 
-#define TIMEOUT_INTERVAL    	5   // sec
+#define TIMEOUT_INTERVAL    	                        (5)   // sec
 __IO uint32_t timeout_cnt = 0;
+uint8_t timeout_flag = 0;
 
-#define DEBUG_UART_PORT						    (UART4)
-#define DEBUG_UART_PORT_IRQn				    (UART4_IRQn)
-#define DEBUG_UART_IRQHandler				    (UART4_IRQHandler)
+#define DEBUG_UART_PORT						            (UART4)
+#define DEBUG_UART_PORT_IRQn				            (UART4_IRQn)
+#define DEBUG_UART_IRQHandler				            (UART4_IRQHandler)
 
 // #define ENABLE_SW_CRC32
 
@@ -364,12 +365,34 @@ uint8_t verify_application_chksum(void)
     }
 }
 
+void set_TimeoutFlag(uint8_t flag)
+{
+    timeout_flag = flag;
+}
+
+uint8_t get_TimeoutFlag(void)
+{
+    return timeout_flag;
+}
+
+void check_Timeout(void)
+{
+    if (timeout_cnt > TIMEOUT_INTERVAL) {
+        LDROM_DEBUG("Time-out, perform CHIP_RST\r\n");
+        SystemReboot_RST(RST_ADDR_APROM,RST_SEL_CHIP);
+    }
+}
+
 void TMR1_IRQHandler(void)
 {
 	
     if(TIMER_GetIntFlag(TIMER1) == 1)
     {
         TIMER_ClearIntFlag(TIMER1);
+        if (get_TimeoutFlag())
+        {
+            LDROM_DEBUG("entry counting :%2d\r\n" , timeout_cnt);
+        }
         timeout_cnt++;
 
 		// tick_counter();
@@ -616,6 +639,7 @@ int main()
         //
         LDROM_DEBUG("Time-out counter start....\r\n");
         TIMER_Start(TIMER1);
+        set_TimeoutFlag(1);
     }
     
     #else
@@ -646,11 +670,7 @@ int main()
             goto _ISP;
         }
 
-        if (timeout_cnt > TIMEOUT_INTERVAL) {
-            LDROM_DEBUG("Time-out, perform CHIP_RST\r\n");
-            SystemReboot_RST(RST_ADDR_APROM,RST_SEL_CHIP);
-        }
-
+        // check_Timeout();
     }
 
 _ISP:

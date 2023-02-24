@@ -56,6 +56,10 @@ void SystemReboot_RST(unsigned char addr , unsigned char sel);
 uint8_t read_magic_tag(void);
 void write_magic_tag(uint8_t tag);
 
+void set_TimeoutFlag(uint8_t flag);
+uint8_t get_TimeoutFlag(void);
+void check_Timeout(void);
+
 #ifdef __ICCARM__
 #pragma data_alignment=4
 extern uint8_t response_buff[64];

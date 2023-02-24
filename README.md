@@ -41,6 +41,8 @@ update @ 2023/02/21
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/LDROM_xmodem_tranfer_finish.jpg)
 
 		- if reset from application code , will entry timeout counting , jump to application code if not receive teraterm Xmodem transfer data		
+				
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/LDROM_time_out.jpg)
 	
 	- Application code project : AP
 	
@@ -71,6 +73,12 @@ update @ 2023/02/21
 		- after project compile finish , binary size will be 110K (total application code size : 0x1B800)
 		
 		- under terminal , use keyboard , '1' , will write specific value in SRAM address , and return to boot loader
+
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/LDROM_time_out.jpg)		
+		
+		- under terminal , use keyboard , '2' , will erase checksum to 0x0000 (address : 0x20000 - 4) , and return to boot loader
+
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/LDROM_erase_checksum.jpg)		
 		
 		- use teraterm Xmodem transfer data , to programming Application code project binary (110K) , when under Boot loader flow
 
@@ -132,4 +140,15 @@ ISP code
 
 APP code
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/GCC_ld_application.jpg)
+
+10. use SRAM with no init section , to store flag 
+
+the flag in ISP code and AP code ( separate with GCC and KEIL compiler ) 
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag)
+
+set SRAM with no init : KEIL option IRM1/IRAM2
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag_KEIL.jpg)
+
+set SRAM with no init : GCC loader
+![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag_GCC_loader_file.jpg)
 

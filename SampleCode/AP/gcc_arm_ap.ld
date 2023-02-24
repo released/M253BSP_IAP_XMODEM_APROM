@@ -3,6 +3,7 @@ MEMORY
 {
   FLASH (rx) : ORIGIN = 0x00004800, LENGTH = 0x1B800    /* 110k */
   RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 0x3FF0     /* 16k - 16  */
+  RAM_NO_INIT (rwx)  : ORIGIN = 0x20003FF0, LENGTH = 0x0F     	/* 16  */
 }
 
 /* Library configurations */
@@ -166,6 +167,27 @@ SECTIONS
 		. = ALIGN(4);
 		__bss_end__ = .;
 	} > RAM
+	
+	.ram_no_init_bss (NOLOAD) :
+	{		
+		
+		. = ALIGN(4);
+		. += 4;
+        *(.ram_no_init_bss*)
+		
+		
+		/*
+	  	. = ALIGN(4);
+	  	__ram_no_init_bss_begin__ = .;
+	  	
+        . += 4;
+	    *(.ram_no_init_bss*) 
+	    
+	    . = ALIGN(4);
+	    __ram_no_init_bss_end__ = .;	
+	    */
+		
+	} > RAM_NO_INIT
 
 	.heap (COPY):
 	{
