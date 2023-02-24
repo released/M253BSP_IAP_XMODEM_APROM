@@ -147,7 +147,7 @@ the flag in ISP code and AP code ( separate with GCC and KEIL compiler )
 
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag.jpg)
 
-set SRAM with no init : KEIL option IRM1/IRAM2
+set SRAM with no init : KEIL option IRAM1/IRAM2
 
 ![image](https://github.com/released/M253BSP_IAP_XMODEM_APROM/blob/main/SRAM_no_init_flag_KEIL.jpg)
 
